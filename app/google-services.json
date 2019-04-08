@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "1099355930580",
+    "firebase_url": "https://pictureselector.firebaseio.com",
+    "project_id": "pictureselector",
+    "storage_bucket": "pictureselector.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1099355930580:android:e90c5a88d42d3596",
+        "android_client_info": {
+          "package_name": "com.example.pictureselector"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIposoJcYzAbn66PO_HTw8boVXuFfrW0U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1099355930580-3v7ki2532gp26n0sogt1lvajc8khh6jv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
