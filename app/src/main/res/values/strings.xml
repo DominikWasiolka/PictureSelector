@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PictureSelector</string>
+    <string name="extra_ret_img_card">return_image_card</string>
 </resources>
