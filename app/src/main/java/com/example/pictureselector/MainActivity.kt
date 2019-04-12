@@ -3,6 +3,10 @@ package com.example.pictureselector
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 //import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -11,19 +15,27 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
+import androidx.recyclerview.widget.DividerItemDecoration
+
+
 
 class MainActivity : AppCompatActivity() {
 
     private val PICK_PHOTO_FOR_AVATAR = 256
     private val ADD_NEW_URL_IMAGE = 255
+    private var swipeBackground: ColorDrawable = ColorDrawable(Color.parseColor("red"))
+    private lateinit var deleteIcon: Drawable
     //private var image : Bitmap
-    var imageCardList:Queue<ImageCard> = LinkedList <ImageCard>()
+    var imageCardList:LinkedList<ImageCard> = LinkedList <ImageCard>()
     var adapter = GroupAdapter<ViewHolder>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +60,68 @@ class MainActivity : AppCompatActivity() {
 
         recycleview_images.adapter = adapter
         recycleview_images.layoutManager = LinearLayoutManager(this)
+        deleteIcon = ContextCompat.getDrawable(this, R.drawable.ic_delete)!!
+
+        val dividerItemDecoration = DividerItemDecoration( // lines between items in recycleview
+            recycleview_images.getContext(),
+            DividerItemDecoration.VERTICAL
+        )
+        recycleview_images.addItemDecoration(dividerItemDecoration)
+
+        // for swap menu
+        val  itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                // delete item
+                Log.d("CUSTOM", "adapter position "+viewHolder.adapterPosition.toString())
+                imageCardList.removeAt(viewHolder.adapterPosition)
+                adapter.notifyItemRemoved(viewHolder.adapterPosition)
+                adapter.removeGroup(imageCardList.size)//remove last free field
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                val itemView = viewHolder.itemView
+                val iconPosition = (itemView.height - deleteIcon.intrinsicHeight) /2
+
+                if (dX>0){
+                    swipeBackground.setBounds(itemView.left, itemView.top, dX.toInt(), itemView.bottom)
+                    deleteIcon.setBounds(itemView.left + iconPosition, itemView.top + iconPosition,
+                        itemView.left+iconPosition + deleteIcon.intrinsicWidth, itemView.bottom - iconPosition)
+                } else{
+                    swipeBackground.setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
+                    deleteIcon.setBounds(itemView.right - iconPosition - deleteIcon.intrinsicWidth, itemView.top + iconPosition,
+                        itemView.right - iconPosition , itemView.bottom - iconPosition)
+                }
+                swipeBackground.draw(c)
+                c.save()
+                
+                c.clipRect(swipeBackground.bounds)
+
+                deleteIcon.draw(c)
+                c.restore()
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            }
+        }
+
+
+        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(recycleview_images)
 
     }
 
