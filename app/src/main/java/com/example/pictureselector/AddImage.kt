@@ -42,6 +42,8 @@ class AddImage : AppCompatActivity() {
     }
 
     fun splitTags(inputString: String) :List<String>{
+        if(inputString.isEmpty())
+            return listOf()
 
         val list_of_tags = inputString.split(", ")
         if (list_of_tags.size<4)

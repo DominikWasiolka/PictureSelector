@@ -2,15 +2,11 @@ package com.example.pictureselector
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.net.Uri
-//import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -19,7 +15,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.activity_main.*
@@ -30,7 +25,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 
 class MainActivity : AppCompatActivity() {
 
-    private val PICK_PHOTO_FOR_AVATAR = 256
     private val ADD_NEW_URL_IMAGE = 255
     private var swipeBackground: ColorDrawable = ColorDrawable(Color.parseColor("red"))
     private lateinit var deleteIcon: Drawable
@@ -42,13 +36,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //activateButton.setOnClickListener(){
-        //pickImage()
-        //to działa równolegle - problem, bo to poniżej wykona się szybciej
-        //}
         generateExampleImages()
-
-
 
         Log.d("CUSTOM", "list Size "+imageCardList.size.toString())
         Log.d("CUSTOM", "created adapter")
@@ -62,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         recycleview_images.layoutManager = LinearLayoutManager(this)
         deleteIcon = ContextCompat.getDrawable(this, R.drawable.ic_delete)!!
 
+        //horizontal line for items separating
         val dividerItemDecoration = DividerItemDecoration( // lines between items in recycleview
             recycleview_images.getContext(),
             DividerItemDecoration.VERTICAL
@@ -109,7 +98,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 swipeBackground.draw(c)
                 c.save()
-                
+
                 c.clipRect(swipeBackground.bounds)
 
                 deleteIcon.draw(c)
@@ -159,34 +148,13 @@ class MainActivity : AppCompatActivity() {
         val result2 = ImageCard("title2",url2,listOf("tag1","tag2"), "12-13-2011")
         imageCardList.add(result2)
 
-        val result3 = ImageCard("title3",url3,listOf("tag1","tag2"), "12-13-2011")
+        val result3 = ImageCard("title3",url3,listOf(), "12-13-2011")
         imageCardList.add(result3)
     }
-
-    private fun pickImage(){
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type ="image/*"
-        startActivityForResult(intent, PICK_PHOTO_FOR_AVATAR)
-    }// podpiąć to pod jakiś guzik;
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(resultCode == Activity.RESULT_OK)
             when (requestCode){
-                PICK_PHOTO_FOR_AVATAR -> {
-                    val selectedImage: Uri? = data!!.data
-                    var image : Bitmap
-                    image = MediaStore.Images.Media.getBitmap(this.contentResolver, selectedImage)
-
-                    val result = ImageCard("title1","url1",listOf("tag1","tag2"), "12-13-2011")//,image)
-                    imageCardList.add(result)
-                    Log.d("CUSTOM", "list Size "+imageCardList.size.toString())
-                    //contentIV.setImageBitmap(image)
-
-                    //val img = FirebaseVisionImage.fromBitmap(image) // obraz, który może być przetwarzany przez image
-
-                    //val labeler = FirebaseVision.getInstance().getOnDeviceImageLabeler()
-
-                }
                 ADD_NEW_URL_IMAGE -> {
                     val returnedImageCard :ImageCard = data?.getSerializableExtra(getString(R.string.extra_ret_img_card)) as ImageCard
                     imageCardList.add(returnedImageCard)
@@ -197,19 +165,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
     }
-/*
-    private fun processImageTagging(){
-        image?.apply(this
-        val tagsDetector.detect(toFirebaseVisonImage())
-            .addOnSuccessLIstener(it
-            processTags(it)
-            ).addONFailureListener( iterator(Log.e(tag)))
-        )
-    }
-
-    private fun processTags(tags: List<FirebaseVisionImageLabel>){
-        val res:List<String!> = tags.map (it.map)
-        Log.d("TAG", res.joinToString(" "))
-    }*/
 }
 
