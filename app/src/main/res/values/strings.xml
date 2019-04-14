@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">PictureSelector</string>
     <string name="extra_ret_img_card">return_image_card</string>
+    <string name="enter_date">Enter Date</string>
+    <string name="date">Date</string>
+    <string name="tags">Tags</string>
+    <string name="title">Title</string>
+    <string name="url">Url</string>
+    <string name="save">SAVE</string>
 </resources>

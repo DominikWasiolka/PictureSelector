@@ -15,11 +15,9 @@ import android.graphics.drawable.Drawable
 class ImageCardItem(val img: ImageCard): Item<ViewHolder>(){
 
     override fun bind(viewHolder: ViewHolder, position: Int) {
-        //var formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+
         viewHolder.itemView.title.text = img.title
-        //viewHolder.itemView.tags.text = img.generateTagSting()
-        viewHolder.itemView.date.text = img.date//formatter.format(img.date)
-        //viewHolder.itemView.image.setImageBitmap(img.bitmap) //tutaj wywołanie obrazu
+        viewHolder.itemView.date.text = img.generateDateString()
 
         if (img.generateTagSting() == "") {
             Log.d("CUSTOM", "prepare to set url")
@@ -44,8 +42,6 @@ class ImageCardItem(val img: ImageCard): Item<ViewHolder>(){
                 override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom) {
 
                     val str:String = processImageTagging(bitmap, viewHolder)
-                    //img.tags = splitTags(str)
-                    //viewHolder.itemView.tags.text = str
                     viewHolder.itemView.image.setImageBitmap(bitmap)
                 }
 
@@ -54,7 +50,6 @@ class ImageCardItem(val img: ImageCard): Item<ViewHolder>(){
                 override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
 
             })
-        //return pictureBitmap
 
     }
 

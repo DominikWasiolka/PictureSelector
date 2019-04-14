@@ -20,7 +20,7 @@ import com.xwray.groupie.ViewHolder
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import androidx.recyclerview.widget.DividerItemDecoration
-
+import java.time.LocalDate
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity() {
     private val ADD_NEW_URL_IMAGE = 255
     private var swipeBackground: ColorDrawable = ColorDrawable(Color.parseColor("red"))
     private lateinit var deleteIcon: Drawable
-    //private var image : Bitmap
     var imageCardList:LinkedList<ImageCard> = LinkedList <ImageCard>()
     var adapter = GroupAdapter<ViewHolder>()
 
@@ -36,11 +35,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        generateExampleImages()
+        //generateExampleImages()
 
         Log.d("CUSTOM", "list Size "+imageCardList.size.toString())
         Log.d("CUSTOM", "created adapter")
-        //tutaj dodać do adaptera
+
         for (imageCard in imageCardList) {
             Log.d("CUSTOM", "Added element to imageCardList")
             adapter.add(ImageCardItem(imageCard))
@@ -57,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         )
         recycleview_images.addItemDecoration(dividerItemDecoration)
 
-        // for swap menu
+        // for swipe menu
         val  itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
             override fun onMove(
                 recyclerView: RecyclerView,
@@ -122,7 +121,6 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId) {
             R.id.add_image -> {
-                //Toast.makeText(this, "item 1 is Selcted", Toast.LENGTH_SHORT).show()
                 openAboutActivity()
                 return super.onOptionsItemSelected(item)
             }
@@ -142,13 +140,13 @@ class MainActivity : AppCompatActivity() {
         val url2 = "https://www.w3schools.com/w3images/nature.jpg"
         val url3 = "https://www.w3schools.com/w3images/fjords.jpg"
 
-        val result1 = ImageCard("title1",url1, listOf("tag1","tag2"), "12-13-2011")
+        val result1 = ImageCard("title1",url1, listOf("tag1","tag2"), LocalDate.now())
         imageCardList.add(result1)
 
-        val result2 = ImageCard("title2",url2,listOf("tag1","tag2"), "12-13-2011")
+        val result2 = ImageCard("title2",url2,listOf("tag1","tag2"), LocalDate.now())
         imageCardList.add(result2)
 
-        val result3 = ImageCard("title3",url3,listOf(), "12-13-2011")
+        val result3 = ImageCard("title3",url3,listOf(),  LocalDate.now())
         imageCardList.add(result3)
     }
 
