@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -25,8 +26,10 @@ import java.time.LocalDate
 
 class MainActivity : AppCompatActivity() {
 
+    val MAX_NUMBER_OF_SIMILAR_IMAGES = 6
     private val ADD_NEW_URL_IMAGE = 255
-    private var swipeBackground: ColorDrawable = ColorDrawable(Color.parseColor("red"))
+    private var swipeDeleteBackground: ColorDrawable = ColorDrawable(Color.parseColor("red"))
+    //private var swipeInfoBackground: ColorDrawable = ColorDrawable(Color.parseColor("blue"))
     private lateinit var deleteIcon: Drawable
     var imageCardList:LinkedList<ImageCard> = LinkedList <ImageCard>()
     var adapter = GroupAdapter<ViewHolder>()
@@ -35,7 +38,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //generateExampleImages()
 
         Log.d("CUSTOM", "list Size "+imageCardList.size.toString())
         Log.d("CUSTOM", "created adapter")
@@ -47,7 +49,6 @@ class MainActivity : AppCompatActivity() {
 
         recycleview_images.adapter = adapter
         recycleview_images.layoutManager = LinearLayoutManager(this)
-        deleteIcon = ContextCompat.getDrawable(this, R.drawable.ic_delete)!!
 
         //horizontal line for items separating
         val dividerItemDecoration = DividerItemDecoration( // lines between items in recycleview
@@ -57,6 +58,13 @@ class MainActivity : AppCompatActivity() {
         recycleview_images.addItemDecoration(dividerItemDecoration)
 
         // for swipe menu
+        addSwipeMenu()
+
+    }
+
+    fun addSwipeMenu(){
+        deleteIcon = ContextCompat.getDrawable(this, R.drawable.ic_delete)!!
+
         val  itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
             override fun onMove(
                 recyclerView: RecyclerView,
@@ -67,11 +75,19 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                // delete item
-                Log.d("CUSTOM", "adapter position "+viewHolder.adapterPosition.toString())
-                imageCardList.removeAt(viewHolder.adapterPosition)
-                adapter.notifyItemRemoved(viewHolder.adapterPosition)
-                adapter.removeGroup(imageCardList.size)//remove last free field
+                Log.d("CUSTOM", "swipe direction " + direction.toString())
+
+                if (direction==8) {
+                    // delete item
+                    Log.d("CUSTOM", "adapter position " + viewHolder.adapterPosition.toString())
+                    imageCardList.removeAt(viewHolder.adapterPosition)
+                    adapter.notifyItemRemoved(viewHolder.adapterPosition)
+                    adapter.removeGroup(imageCardList.size)//remove last free field
+                }
+                else {
+                    val imageCard = imageCardList[viewHolder.adapterPosition]
+                    openDetailsActivity(imageCard)
+                }
             }
 
             override fun onChildDraw(
@@ -87,30 +103,25 @@ class MainActivity : AppCompatActivity() {
                 val iconPosition = (itemView.height - deleteIcon.intrinsicHeight) /2
 
                 if (dX>0){
-                    swipeBackground.setBounds(itemView.left, itemView.top, dX.toInt(), itemView.bottom)
+                    swipeDeleteBackground.setBounds(itemView.left, itemView.top, dX.toInt(), itemView.bottom)
                     deleteIcon.setBounds(itemView.left + iconPosition, itemView.top + iconPosition,
                         itemView.left+iconPosition + deleteIcon.intrinsicWidth, itemView.bottom - iconPosition)
-                } else{
-                    swipeBackground.setBounds(itemView.right + dX.toInt(), itemView.top, itemView.right, itemView.bottom)
-                    deleteIcon.setBounds(itemView.right - iconPosition - deleteIcon.intrinsicWidth, itemView.top + iconPosition,
-                        itemView.right - iconPosition , itemView.bottom - iconPosition)
+
+                    swipeDeleteBackground.draw(c)
+                    c.save()
+
+                    c.clipRect(swipeDeleteBackground.bounds)
+
+                    deleteIcon.draw(c)
+                    c.restore()
+
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+
                 }
-                swipeBackground.draw(c)
-                c.save()
-
-                c.clipRect(swipeBackground.bounds)
-
-                deleteIcon.draw(c)
-                c.restore()
-
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             }
         }
-
-
         val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
         itemTouchHelper.attachToRecyclerView(recycleview_images)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -127,11 +138,21 @@ class MainActivity : AppCompatActivity() {
 
             else -> return super.onOptionsItemSelected(item)
         }
-
     }
 
     fun openAboutActivity(){
         val intent = Intent(this,AddImage::class.java)
+        startActivityForResult(intent, ADD_NEW_URL_IMAGE)
+    }
+
+    fun openDetailsActivity(imageCard:ImageCard){
+        val intent = Intent(this,ImageDetails::class.java)
+        intent.putExtra("imageCard", imageCard)
+
+        val similarUrls = findSimilarImages(imageCard)
+        intent.putExtra("similarUrls",similarUrls)
+
+        Log.d("CUSTOM", "Extra similarUrls ok")
         startActivityForResult(intent, ADD_NEW_URL_IMAGE)
     }
 
@@ -148,6 +169,23 @@ class MainActivity : AppCompatActivity() {
 
         val result3 = ImageCard("title3",url3,listOf(),  LocalDate.now())
         imageCardList.add(result3)
+    }
+
+    fun findSimilarImages(currentImage: ImageCard):String {
+        var iterator = 0
+        var urls = ""
+        var urlList = Array<String>(6){""}
+        for (img in imageCardList){
+            if(currentImage.generateTagSting() == img.generateTagSting()) {
+                urls+=img.url+" "
+                urlList[iterator]=img.url
+                iterator+=1
+                if (iterator == MAX_NUMBER_OF_SIMILAR_IMAGES)
+                    break
+            }
+        }
+        Log.d("CUSTOM", "Similar Urls were generated")
+        return urls
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

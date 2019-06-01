@@ -25,7 +25,7 @@ class AddImage : AppCompatActivity() {
         val button = findViewById<Button>(R.id.save_button)
         button.setOnClickListener(object : View.OnClickListener{
             override fun onClick(v: View?) {
-                val url = (findViewById<EditText>(R.id.url)).text.toString()
+                val url = (findViewById<EditText>(R.id.img_url)).text.toString()
 
                 if (url.isEmpty()){
                     whenUrlEmpty()

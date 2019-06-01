@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:id="@+id/url" android:layout_alignParentEnd="true" android:layout_marginEnd="104dp"
+            android:id="@+id/img_url" android:layout_alignParentEnd="true" android:layout_marginEnd="104dp"
             android:layout_alignParentStart="true" android:layout_marginStart="94dp" android:layout_marginTop="16dp"
             android:layout_alignParentTop="true" android:inputType="textUri"/>
     <EditText
@@ -35,8 +35,8 @@
             android:ems="10"
             android:id="@+id/title" android:layout_marginEnd="0dp"
             android:layout_marginStart="0dp" android:layout_marginTop="16dp"
-            android:layout_below="@+id/url" android:inputType="text" android:layout_alignStart="@+id/url"
-            android:layout_alignEnd="@+id/url"/>
+            android:layout_below="@+id/img_url" android:inputType="text" android:layout_alignStart="@+id/img_url"
+            android:layout_alignEnd="@+id/img_url"/>
     <TextView
             android:text="@string/url"
             android:layout_width="wrap_content"
